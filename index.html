@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vMind Task Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-header-orange { background-color: #ff6600; color: white; border-radius: 15px 15px 0 0 !important; }
+        .badge-pill { border-radius: 20px; padding: 6px 12px; font-weight: 600; }
+        .task-card { border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.2s ease; background-color: white; }
+        .check-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; }
+        .check-btn.completed { background-color: #10b981; border-color: #10b981; color: white; }
+    </style>
+</head>
+<body class="py-5">
+
+<div class="container" style="max-width: 750px;">
+    <div class="card shadow-lg border-0" style="border-radius: 15px;">
+        
+        <!-- Header -->
+        <div class="card-header card-header-orange p-4 text-center">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge bg-white text-dark badge-pill"><i class="bi bi-cpu me-1"></i> Kubernetes Native</span>
+                <span class="badge bg-dark badge-pill"><i class="bi bi-database me-1"></i> PostgreSQL Operator</span>
+            </div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-cloud-upload me-2"></i>vMind Task Center</h2>
+            <p class="mb-0 opacity-75">Cloud Infrastructure & Automated S3 Backup Pipeline</p>
+        </div>
+
+        <div class="card-body p-4">
+            
+            <!-- Dashboard Info -->
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <small class="text-muted fw-bold d-block mb-1">TOPLAM GÖREV</small>
+                        <h3 class="fw-bold mb-0">{{ todos|length if todos else 0 }}</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <small class="text-muted fw-bold d-block mb-1">S3 BACKUP STATUS</small>
+                        <span class="text-success fw-bold"><i class="bi bi-shield-check me-1"></i>Aktif (Betap)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GÖREV EKLEME FORMU -->
+            <form action="/add" method="POST" class="mb-4 p-3 border rounded-3 bg-light">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">Görev Başlığı:</label>
+                    <input type="text" name="title" class="form-control form-control-lg" placeholder="vMind bulut altyapısı için yeni görev..." required>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary mb-1">📅 Başlangıç Tarihi & Saati:</label>
+                        <input type="datetime-local" name="start_time" class="form-control" style="border: 2px solid #ff6600;">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary mb-1">🏁 Planlanan Bitiş Tarihi:</label>
+                        <input type="datetime-local" name="end_time" class="form-control" style="border: 2px solid #ff6600;">
+                    </div>
+                </div>
+
+                <button class="btn btn-warning text-white fw-bold w-100 py-2" type="submit" style="background-color: #ff6600; border: none;">
+                    <i class="bi bi-plus-circle me-1"></i> Görevi Kaydet
+                </button>
+            </form>
+
+            <!-- GÖREV LİSTESİ -->
+            <div class="task-list d-flex flex-column gap-3">
+                {% for task in todos %}
+                <div class="task-card p-3 d-flex align-items-center justify-content-between">
+                    
+                    <!-- Tik Atma / Tamamlama -->
+                    <form action="/toggle/{{ task.id }}" method="POST" class="m-0">
+                        <button type="submit" class="check-btn {{ 'completed' if task.completed }}">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </form>
+
+                    <!-- Detaylar -->
+                    <div class="ms-3 flex-grow-1">
+                        <div class="fw-bold text-dark fs-6 {{ 'text-decoration-line-through text-muted' if task.completed }}">{{ task.title }}</div>
+                        
+                        <div class="d-flex flex-wrap align-items-center gap-2 mt-1" style="font-size: 0.82rem;">
+                            <span class="text-muted"><i class="bi bi-clock me-1"></i>ID: #{{ task.id }}</span>
+                            
+                            {% if task.start_time or task.end_time %}
+                            <span class="badge bg-primary text-white">
+                                📅 {{ task.start_time if task.start_time else '—' }} ➔ {{ task.end_time if task.end_time else '—' }}
+                            </span>
+                            {% endif %}
+
+                            {% if task.completed and task.completed_at %}
+                            <span class="badge bg-success text-white">
+                                ✅ Tamamlandı: {{ task.completed_at }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Silme -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-warning text-dark px-3">Production</span>
+                        <a href="/delete/{{ task.id }}" class="btn btn-link text-danger p-0 ms-2"><i class="bi bi-trash fs-5"></i></a>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer bg-dark text-white p-3 d-flex justify-content-around text-center" style="border-radius: 0 0 15px 15px;">
+            <small><i class="bi bi-hdd-network text-warning me-1"></i> Persistent Volume: 5GB</small>
+            <small><i class="bi bi-cloud-arrow-up text-info me-1"></i> Object Storage: S3 PortVMind</small>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

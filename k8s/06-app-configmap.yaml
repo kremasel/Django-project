@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: todo-app-configmap
+    namespace: todo-production
+data:
+    DB_HOST: "postgres-cluster-rw.todo-production.svc.cluster.local" 
+    DB_NAME: "app"
+    DB_USER: "app"
+    DB_PORT: "5432"    
