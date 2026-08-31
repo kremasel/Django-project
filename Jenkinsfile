@@ -33,18 +33,19 @@ pipeline {
         }
 
         stage('Deploy to RKE2 Cluster') {
-            steps {
-                script {
-                    withKubeConfig([credentialsId: 'k8s-kubeconfig']) {
-                        sh "kubectl apply -f k8s/cluster-issuer.yaml"
-                        sh "kubectl apply -f k8s/ingress.yaml"
-                        sh "kubectl apply -f nginx-deployment.yaml"
-                        sh "kubectl rollout status deployment/django-nginx-deployment --timeout=60s"
-                    }
-                }
-            }
+    steps {
+        script {
+            echo "RKE2 cluster'ına deployment yapılıyor..."
+            sh """
+                export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+                kubectl apply -f k8s/cluster-issuer.yaml
+                kubectl apply -f k8s/ingress.yaml
+                kubectl apply -f nginx-deployment.yaml
+                kubectl rollout status deployment/django-ngin
+            """
         }
     }
+}
 
     post {
         success {
