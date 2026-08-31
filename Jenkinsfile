@@ -21,7 +21,7 @@ pipeline {
                     
                     echo "İmajlar Docker Hub'a gönderiliyor..."
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                        sh "echo \$DOCKER_PASS | docker login -u kremasel --password-stdin"
                         
                         sh "docker push ${REGISTRY}:${IMAGE_TAG}"
                         sh "docker push ${REGISTRY}:latest"
