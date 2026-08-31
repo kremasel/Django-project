@@ -37,11 +37,11 @@ pipeline {
                 script {
                     echo "RKE2 cluster'ına deployment yapılıyor..."
                     sh """
-                        export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
-                        kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml apply --validate=false -f k8s/cluster-issuer.yaml
-                        kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml apply --validate=false -f k8s/ingress.yaml
-                        kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml apply --validate=false -f nginx-deployment.yaml
-                        kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml rollout status deployment/django-ngin
+                        export KUBECONFIG=./.kube/config
+                        kubectl apply --validate=false -f k8s/cluster-issuer.yaml
+                        kubectl apply --validate=false -f k8s/ingress.yaml
+                        kubectl apply --validate=false -f nginx-deployment.yaml
+                        kubectl rollout status deployment/django-ngin
                     """
                 }
             }
